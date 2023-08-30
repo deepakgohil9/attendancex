@@ -7,7 +7,7 @@ module.exports = async (req, res, next) => {
 	}
 
 	const access_token = req.headers.authorization.replace(/^Bearer\s/, '')
-	const refresh_token = req.headers['x-refersh-token']
+	const refresh_token = req.headers['x-refresh-token']
 
 	const { decoded, exprired } = verify_jwt(access_token, 'access')
 

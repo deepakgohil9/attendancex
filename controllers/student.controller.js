@@ -15,7 +15,7 @@ const get_all_student = async (req, res, next) => {
 		let query = {}
 		if (req.query.class) { query.class = req.query.class }
 
-		if (req.query.student) { query.full_name = { $regex: req.query.name, $options: 'i' } }
+		if (req.query.student) { query.full_name = { $regex: req.query.student, $options: 'i' } }
 
 		const students = await Student.find(query).populate('class', { description: 0, url: 0 })
 		res.send({ message: 'student fetched successfully!', data: students })

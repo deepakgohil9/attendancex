@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const Attendance = require('../models/attendance.model')
 const Student = require('../models/student.model')
+const send_message = require('../utils/send_message')
 
 const mark_attendance = async (req, res, next) => {
 	try {
@@ -42,4 +43,23 @@ const update_attendance = async (req, res, next) => {
 	}
 }
 
-module.exports = { mark_attendance, update_attendance, get_attendance }
+const send_bulk_message = async (req, res, next) => {
+	try {
+		const attendance = await Attendance.findById(req.body.id).populate(['class', 'attendance.student'])
+		const date = new Date(attendance.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' })
+		const result = await Promise.allSettled(attendance.attendance.map((row) => {
+			return send_message(row.student.phone_number, row.student.full_name, row.mark, date)
+		}))
+
+		attendance.attendance.forEach((row, i) => {
+			row.message_status = (result[i].value == 200) ? 'sent' : 'failed'
+		})
+
+		await attendance.save()
+		return res.send({ message: 'attendance marked!', data: attendance })
+	} catch (error) {
+		next(error)
+	}
+}
+
+module.exports = { mark_attendance, update_attendance, get_attendance, send_bulk_message }

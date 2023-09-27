@@ -11,5 +11,9 @@ const update_attendance_schema = Joi.object().keys({
 	mark: Joi.string().valid('present', 'absent', 'unmarked').required(),
 })
 
+const message_schema = Joi.object().keys({
+	id: Joi.string().hex().length(24).required()
+})
 
-module.exports = { mark_attendance_schema, update_attendance_schema }
+
+module.exports = { mark_attendance_schema, update_attendance_schema, message_schema }

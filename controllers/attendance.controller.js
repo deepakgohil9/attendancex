@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const Attendance = require('../models/attendance.model')
 const Student = require('../models/student.model')
-const send_message = require('../utils/send_message')
+const send_telegram_message = require('../utils/send_telegram_message')
 
 const mark_attendance = async (req, res, next) => {
 	try {
@@ -48,7 +48,8 @@ const send_bulk_message = async (req, res, next) => {
 		const attendance = await Attendance.findById(req.body.id).populate(['class', 'attendance.student'])
 		const date = new Date(attendance.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' })
 		const result = await Promise.allSettled(attendance.attendance.map((row) => {
-			return send_message(row.student.phone_number, row.student.full_name, row.mark, date)
+			// return send_message(row.student.phone_number, row.student.full_name, row.mark, date)
+			return send_telegram_message(row.student.telegram_id, row.student.full_name, row.mark, date)
 		}))
 
 		attendance.attendance.forEach((row, i) => {
